@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Closet - Community Resources Map</title>
+    
+    <!-- Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🥗 Food Closet</h1>
+            <p>Find free meals and food boxes near you</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Search and Filter Section -->
+        <aside class="sidebar">
+            <div class="search-section">
+                <h2>Find Resources</h2>
+                
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search by name or address..."
+                        class="search-input"
+                    >
+                </div>
+
+                <div class="filter-section">
+                    <h3>Filter by Type</h3>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="filter-checkbox" value="food-box" checked>
+                        Food Boxes
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="filter-checkbox" value="meal-site" checked>
+                        Free Meals
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="filter-checkbox" value="soup-kitchen" checked>
+                        Soup Kitchens
+                    </label>
+                </div>
+
+                <div class="admin-section">
+                    <div id="adminLogin" class="admin-login">
+                        <button id="showLoginForm" class="secondary-btn">🔒 Admin Login</button>
+                    </div>
+                    <div id="adminControls" class="admin-controls hidden">
+                        <button id="openAddForm" class="primary-btn">+ Add Resource</button>
+                        <button id="logoutBtn" class="secondary-btn">Logout</button>
+                    </div>
+                </div>
+
+                <div id="loginForm" class="login-form hidden">
+                    <h3>Admin Login</h3>
+                    <form id="adminLoginForm">
+                        <label>Password</label>
+                        <input type="password" id="adminPassword" class="text-input" required>
+                        <div class="form-buttons">
+                            <button type="submit" class="primary-btn">Login</button>
+                            <button type="button" id="cancelLogin" class="secondary-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="resourceFormContainer" class="resource-form hidden">
+                    <h3 id="formTitle">Add Resource</h3>
+                    <form id="resourceForm">
+                        <input type="hidden" id="resourceId" value="">
+                        <label>Type</label>
+                        <select id="resourceType" class="text-input" required>
+                            <option value="food-box">Food Box</option>
+                            <option value="meal-site">Free Meal</option>
+                            <option value="soup-kitchen">Soup Kitchen</option>
+                        </select>
+                        <label>Name</label>
+                        <input type="text" id="resourceName" class="text-input" required>
+                        <label>Address</label>
+                        <input type="text" id="resourceAddress" class="text-input" required>
+                        <label>Phone</label>
+                        <input type="text" id="resourcePhone" class="text-input" required>
+                        <label>Latitude</label>
+                        <input type="number" id="resourceLatitude" class="text-input" step="any" required>
+                        <label>Longitude</label>
+                        <input type="number" id="resourceLongitude" class="text-input" step="any" required>
+                        <label>Hours</label>
+                        <input type="text" id="resourceHours" class="text-input" required>
+                        <label>Description</label>
+                        <textarea id="resourceDescription" class="text-input" rows="3" required></textarea>
+                        <label>Notes</label>
+                        <textarea id="resourceNotes" class="text-input" rows="2"></textarea>
+                        <div class="form-buttons">
+                            <button type="submit" class="primary-btn">Save</button>
+                            <button type="button" id="cancelForm" class="secondary-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="resourcesList" class="resources-list">
+                    <!-- Resources will be populated here by JavaScript -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Section -->
+        <main class="main-content">
+            <div id="map" class="map-container"></div>
+            
+            <!-- Resource Detail Popup (shown when clicking a location) -->
+            <div id="detailPopup" class="detail-popup hidden">
+                <button class="close-btn" id="closePopup">&times;</button>
+                <div id="detailContent" class="detail-content">
+                    <!-- Details populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
