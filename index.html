@@ -12,29 +12,30 @@
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1>🥗 Food Closet</h1>
-            <p>Find free meals and food boxes near you</p>
+        <div class="site-topbar">
+            <div class="brand">
+                <a href="#" class="brand-link" aria-label="Kitsap Food and Homeless Support">
+                    <svg viewBox="0 0 64 64" class="brand-logo" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                        <circle cx="32" cy="32" r="30" fill="#1b4d2a" />
+                        <path d="M15 42c0-9 9-16 17-16s17 7 17 16H15z" fill="#f8d66d" />
+                        <path d="M22 42c0 4.8 3.6 8 10 8s10-3.2 10-8" fill="#fff" />
+                        <path d="M18 34c3-3 8-3 8-3s1-4 6-4 6 4 6 4 5 0 8 3" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" />
+                        <path d="M25 22c2.5-3 6.5-3 9 0 2.2 2.7 2.2 6.7 0 9.5-2.5 3-6.5 3-9 0-2.2-2.8-2.2-6.8 0-9.5Z" fill="#e14a4a" />
+                        <path d="M14 46c4-2 10-4 18-4s14 2 18 4" fill="none" stroke="#8bd37c" stroke-width="4" stroke-linecap="round" />
+                    </svg>
+                </a>
+            </div>
+            <div class="topbar-title">
+                <h1>Kitsap Food Closet</h1>
+                <p>Find resources near you</p>
+            </div>
+            <div class="topbar-spacer"></div>
         </div>
-    </header>
 
-    <div class="container">
-        <!-- Search and Filter Section -->
-        <aside class="sidebar">
-            <div class="search-section">
-                <h2>Find Resources</h2>
-                
-                <div class="search-box">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="Search by name or address..."
-                        class="search-input"
-                    >
-                </div>
-
+        <div class="header-bottom" style="display:none;">
+            <div class="topbar-controls">
                 <div class="filter-section">
-                    <h3>Filter by Type</h3>
+                    <h3>Filter</h3>
                     <label class="checkbox-label">
                         <input type="checkbox" class="filter-checkbox" value="food-box" checked>
                         Food Boxes
@@ -48,78 +49,98 @@
                         Soup Kitchens
                     </label>
                 </div>
+            </div>
+        </div>
 
-                <div class="admin-section">
-                    <div id="adminLogin" class="admin-login">
-                        <button id="showLoginForm" class="secondary-btn">🔒 Admin Login</button>
-                    </div>
-                    <div id="adminControls" class="admin-controls hidden">
-                        <button id="openAddForm" class="primary-btn">+ Add Resource</button>
-                        <button id="logoutBtn" class="secondary-btn">Logout</button>
-                    </div>
-                </div>
-
-                <div id="loginForm" class="login-form hidden">
-                    <h3>Admin Login</h3>
-                    <form id="adminLoginForm">
-                        <label>Password</label>
-                        <input type="password" id="adminPassword" class="text-input" required>
-                        <div class="form-buttons">
-                            <button type="submit" class="primary-btn">Login</button>
-                            <button type="button" id="cancelLogin" class="secondary-btn">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="resourceFormContainer" class="resource-form hidden">
-                    <h3 id="formTitle">Add Resource</h3>
-                    <form id="resourceForm">
-                        <input type="hidden" id="resourceId" value="">
-                        <label>Type</label>
-                        <select id="resourceType" class="text-input" required>
-                            <option value="food-box">Food Box</option>
-                            <option value="meal-site">Free Meal</option>
-                            <option value="soup-kitchen">Soup Kitchen</option>
-                        </select>
-                        <label>Name</label>
-                        <input type="text" id="resourceName" class="text-input" required>
-                        <label>Address</label>
-                        <input type="text" id="resourceAddress" class="text-input" required>
-                        <label>Phone</label>
-                        <input type="text" id="resourcePhone" class="text-input" required>
-                        <label>Latitude</label>
-                        <input type="number" id="resourceLatitude" class="text-input" step="any" required>
-                        <label>Longitude</label>
-                        <input type="number" id="resourceLongitude" class="text-input" step="any" required>
-                        <label>Hours</label>
-                        <input type="text" id="resourceHours" class="text-input" required>
-                        <label>Description</label>
-                        <textarea id="resourceDescription" class="text-input" rows="3" required></textarea>
-                        <label>Notes</label>
-                        <textarea id="resourceNotes" class="text-input" rows="2"></textarea>
-                        <div class="form-buttons">
-                            <button type="submit" class="primary-btn">Save</button>
-                            <button type="button" id="cancelForm" class="secondary-btn">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="resourcesList" class="resources-list">
-                    <!-- Resources will be populated here by JavaScript -->
+        <div class="view-panel">
+            <div class="view-toggle">
+                <button id="showMapView" class="toggle-btn active">Map View</button>
+                <button id="showListView" class="toggle-btn">List View</button>
+            </div>
+            <div class="admin-section">
+                <button id="showLoginForm" class="secondary-btn">Login</button>
+                <div id="adminControls" class="admin-controls hidden">
+                    <button id="openAddForm" class="primary-btn">+ Add</button>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <!-- Map Section -->
-        <main class="main-content">
-            <div id="map" class="map-container"></div>
-            
-            <!-- Resource Detail Popup (shown when clicking a location) -->
-            <div id="detailPopup" class="detail-popup hidden">
-                <button class="close-btn" id="closePopup">&times;</button>
-                <div id="detailContent" class="detail-content">
-                    <!-- Details populated by JavaScript -->
+        <div id="loginForm" class="login-form hidden">
+            <h3>Admin Login</h3>
+            <form id="adminLoginForm">
+                <label>Password</label>
+                <input type="password" id="adminPassword" class="text-input" required>
+                <div class="form-buttons">
+                    <button type="submit" class="primary-btn">Login</button>
+                    <button type="button" id="cancelLogin" class="secondary-btn">Cancel</button>
                 </div>
+            </form>
+        </div>
+
+        <div id="resourceFormContainer" class="resource-form hidden">
+            <h3 id="formTitle">Add Resource</h3>
+            <form id="resourceForm">
+                <input type="hidden" id="resourceId" value="">
+                <label>Type</label>
+                <select id="resourceType" class="text-input" required>
+                    <option value="food-box">Food Box</option>
+                    <option value="meal-site">Free Meal</option>
+                    <option value="soup-kitchen">Soup Kitchen</option>
+                </select>
+                <label>Name</label>
+                <input type="text" id="resourceName" class="text-input" required>
+                <label>Address</label>
+                <input type="text" id="resourceAddress" class="text-input" required>
+                <label>Phone</label>
+                <input type="text" id="resourcePhone" class="text-input" required>
+                <label>Website</label>
+                <input type="url" id="resourceWebsite" class="text-input" placeholder="https://example.org">
+                <label>Latitude</label>
+                <input type="number" id="resourceLatitude" class="text-input" step="any" required>
+                <label>Longitude</label>
+                <input type="number" id="resourceLongitude" class="text-input" step="any" required>
+                <label>Hours</label>
+                <input type="text" id="resourceHours" class="text-input" required>
+                <label>Description</label>
+                <textarea id="resourceDescription" class="text-input" rows="3" required></textarea>
+                <label>Notes</label>
+                <textarea id="resourceNotes" class="text-input" rows="2"></textarea>
+                <div class="form-buttons">
+                    <button type="submit" class="primary-btn">Save</button>
+                    <button type="button" id="cancelForm" class="secondary-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <div class="main-panel">
+                <div class="search-float">
+                    <div class="site-search">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Search food resources..."
+                            class="search-input"
+                        >
+                        <button class="search-icon-btn" aria-label="Search">🔍</button>
+                    </div>
+                </div>
+                <div class="map-panel">
+                    <div id="map" class="map-container"></div>
+                    <div id="detailPopup" class="detail-popup hidden">
+                        <button class="close-btn" id="closePopup">&times;</button>
+                        <div id="detailContent" class="detail-content"></div>
+                    </div>
+                </div>
+                <aside id="listPanel" class="list-panel hidden">
+                    <div class="list-panel-header">
+                        <h3>Resources in View</h3>
+                        <p>Click a resource to center it on the map.</p>
+                    </div>
+                    <div id="listResources" class="resources-list"></div>
+                </aside>
             </div>
         </main>
     </div>

@@ -57,14 +57,14 @@ class FoodClosetApp {
      * Update the UI based on admin status
      */
     updateAdminUI() {
-        const adminLogin = document.getElementById('adminLogin');
+        const loginBtn = document.getElementById('showLoginForm');
         const adminControls = document.getElementById('adminControls');
 
         if (this.isAdmin) {
-            adminLogin.classList.add('hidden');
+            loginBtn.textContent = 'Logout';
             adminControls.classList.remove('hidden');
         } else {
-            adminLogin.classList.remove('hidden');
+            loginBtn.textContent = 'Login';
             adminControls.classList.add('hidden');
         }
 
@@ -144,15 +144,32 @@ class FoodClosetApp {
             this.closeDetailPopup();
         });
 
-        document.getElementById('detailPopup').addEventListener('click', (e) => {
-            if (e.target.id === 'detailPopup') {
+        const detailPopup = document.getElementById('detailPopup');
+        const detailContent = document.getElementById('detailContent');
+
+        detailPopup.addEventListener('click', (e) => {
+            if (!detailContent.contains(e.target)) {
                 this.closeDetailPopup();
             }
         });
 
-        // Admin login events
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeDetailPopup();
+            }
+        });
+
+        this.map.on('click', () => {
+            this.closeDetailPopup();
+        });
+
+        // Admin login/logout events
         document.getElementById('showLoginForm').addEventListener('click', () => {
-            this.showLoginForm();
+            if (this.isAdmin) {
+                this.handleAdminLogout();
+            } else {
+                this.showLoginForm();
+            }
         });
 
         document.getElementById('cancelLogin').addEventListener('click', () => {
@@ -167,8 +184,12 @@ class FoodClosetApp {
             }
         });
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            this.handleAdminLogout();
+        document.getElementById('showMapView').addEventListener('click', () => {
+            this.showMapView();
+        });
+
+        document.getElementById('showListView').addEventListener('click', () => {
+            this.showListView();
         });
 
         // Resource form events
@@ -211,59 +232,78 @@ class FoodClosetApp {
     }
 
     /**
-     * Render the list of resources in the sidebar
+     * Render the list of resources in the side panel
      */
     renderResources() {
-        const resourcesList = document.getElementById('resourcesList');
-        resourcesList.innerHTML = '';
+        const listResources = document.getElementById('listResources');
+        listResources.innerHTML = '';
 
         if (this.filteredResources.length === 0) {
-            resourcesList.innerHTML = '<p style="color: #999; text-align: center;">No resources found</p>';
+            listResources.innerHTML = '<p style="color: #999; text-align: center;">No resources found</p>';
             return;
         }
 
         this.filteredResources.forEach(resource => {
-            const resourceEl = document.createElement('div');
-            resourceEl.className = 'resource-item';
+            listResources.appendChild(this.createResourceListItem(resource));
+        });
+    }
 
-            const actionsHtml = this.isAdmin ? `
-                <div class="resource-actions">
-                    <button class="small-btn edit-btn" data-id="${resource.id}">Edit</button>
-                    <button class="small-btn delete-btn" data-id="${resource.id}">Delete</button>
-                </div>
-            ` : '';
+    /**
+     * Create a resource card for the list panel
+     */
+    createResourceListItem(resource) {
+        const typeInfo = resourceTypes[resource.type];
+        const container = document.createElement('div');
+        container.className = 'resource-card';
 
-            resourceEl.innerHTML = `
-                <div class="resource-summary">
-                    <div>
-                        <h4>${resourceTypes[resource.type].emoji} ${resource.name}</h4>
-                        <p>${resource.address}</p>
-                        <span class="resource-type">${resourceTypes[resource.type].label}</span>
+        const actionsHtml = this.isAdmin ? `
+            <div class="resource-actions">
+                <button class="small-btn edit-btn" data-id="${resource.id}">Edit</button>
+                <button class="small-btn delete-btn" data-id="${resource.id}">Delete</button>
+            </div>
+        ` : '';
+
+        const websiteHtml = resource.website ? `
+            <a href="${resource.website}" target="_blank" rel="noopener noreferrer" class="resource-link">Visit Website</a>
+        ` : '';
+
+        container.innerHTML = `
+            <div class="resource-summary">
+                <div>
+                    <h4>${typeInfo.emoji} ${resource.name}</h4>
+                    <p>${resource.address}</p>
+                    <span class="resource-type">${typeInfo.label}</span>
+                    <p class="resource-description">${resource.description}</p>
+                    <div class="resource-extra">
+                        <span class="resource-hours">Hours: ${resource.hours}</span>
+                        ${websiteHtml}
                     </div>
-                    ${actionsHtml}
                 </div>
-            `;
+                ${actionsHtml}
+            </div>
+        `;
 
-            resourceEl.querySelector('.resource-summary').addEventListener('click', (event) => {
-                if (event.target.closest('.resource-actions')) {
-                    return;
-                }
-                this.showResourceDetail(resource);
-                this.centerMapOnResource(resource);
-            });
-
-            if (this.isAdmin) {
-                resourceEl.querySelector('.edit-btn').addEventListener('click', () => {
-                    this.openResourceForm('edit', resource);
-                });
-
-                resourceEl.querySelector('.delete-btn').addEventListener('click', () => {
-                    this.deleteResource(resource.id);
-                });
+        container.addEventListener('click', (event) => {
+            if (event.target.closest('.resource-actions')) {
+                return;
             }
 
-            resourcesList.appendChild(resourceEl);
+            this.showResourceDetail(resource);
+            this.centerMapOnResource(resource);
+            this.openMarkerPopup(resource.id);
         });
+
+        if (this.isAdmin) {
+            container.querySelector('.edit-btn').addEventListener('click', () => {
+                this.openResourceForm('edit', resource);
+            });
+
+            container.querySelector('.delete-btn').addEventListener('click', () => {
+                this.deleteResource(resource.id);
+            });
+        }
+
+        return container;
     }
 
     /**
@@ -271,6 +311,46 @@ class FoodClosetApp {
      */
     addMarkersToMap() {
         this.updateMarkersOnMap();
+    }
+
+    /**
+     * Show the map view and hide the list panel
+     */
+    showMapView() {
+        document.getElementById('listPanel').classList.add('hidden');
+        document.getElementById('showMapView').classList.add('active');
+        document.getElementById('showListView').classList.remove('active');
+
+        if (this.map) {
+            setTimeout(() => {
+                this.map.invalidateSize();
+            }, 200);
+        }
+    }
+
+    /**
+     * Show the list panel next to the map
+     */
+    showListView() {
+        document.getElementById('listPanel').classList.remove('hidden');
+        document.getElementById('showMapView').classList.remove('active');
+        document.getElementById('showListView').classList.add('active');
+
+        if (this.map) {
+            setTimeout(() => {
+                this.map.invalidateSize();
+            }, 200);
+        }
+    }
+
+    /**
+     * Open the popup for the resource marker on the map
+     */
+    openMarkerPopup(resourceId) {
+        const marker = this.markers.find(marker => marker.resourceId === resourceId);
+        if (marker) {
+            marker.openPopup();
+        }
     }
 
     /**
@@ -305,6 +385,8 @@ class FoodClosetApp {
                 .bindPopup(this.createPopupContent(resource))
                 .addTo(this.map);
 
+            marker.resourceId = resource.id;
+
             marker.addEventListener('click', () => {
                 this.showResourceDetail(resource);
             });
@@ -322,6 +404,7 @@ class FoodClosetApp {
                 <strong>${resource.name}</strong><br>
                 ${resource.address}<br>
                 <small>${resource.hours}</small>
+                ${resource.website ? `<br><a href="${resource.website}" target="_blank" rel="noopener noreferrer" style="color: #2ecc71;">Website</a>` : ''}
             </div>
         `;
     }
@@ -357,6 +440,18 @@ class FoodClosetApp {
                     </span>
                 </p>
             </div>
+            ${resource.website ? `
+            <div class="detail-section">
+                <p>
+                    <span class="detail-label">🔗 Website:</span><br>
+                    <span class="detail-value">
+                        <a href="${resource.website}" target="_blank" rel="noopener noreferrer" style="color: #2ecc71;">
+                            ${resource.website}
+                        </a>
+                    </span>
+                </p>
+            </div>
+            ` : ''}
             <div class="detail-section">
                 <p>
                     <span class="detail-label">📝 About:</span><br>
@@ -409,6 +504,7 @@ class FoodClosetApp {
             document.getElementById('resourceName').value = resource.name;
             document.getElementById('resourceAddress').value = resource.address;
             document.getElementById('resourcePhone').value = resource.phone;
+            document.getElementById('resourceWebsite').value = resource.website || '';
             document.getElementById('resourceLatitude').value = resource.latitude;
             document.getElementById('resourceLongitude').value = resource.longitude;
             document.getElementById('resourceHours').value = resource.hours;
@@ -420,6 +516,7 @@ class FoodClosetApp {
             document.getElementById('resourceName').value = '';
             document.getElementById('resourceAddress').value = '';
             document.getElementById('resourcePhone').value = '';
+            document.getElementById('resourceWebsite').value = '';
             document.getElementById('resourceLatitude').value = '';
             document.getElementById('resourceLongitude').value = '';
             document.getElementById('resourceHours').value = '';
@@ -448,6 +545,7 @@ class FoodClosetApp {
             name: document.getElementById('resourceName').value.trim(),
             address: document.getElementById('resourceAddress').value.trim(),
             phone: document.getElementById('resourcePhone').value.trim(),
+            website: document.getElementById('resourceWebsite').value.trim(),
             latitude: Number(document.getElementById('resourceLatitude').value),
             longitude: Number(document.getElementById('resourceLongitude').value),
             hours: document.getElementById('resourceHours').value.trim(),
