@@ -121,9 +121,6 @@ const Footer: React.FC = () => {
           <p>
             © {currentYear} Food Closet. Made with <HeartIcon size={14} fill="currentColor" /> for the community.
           </p>
-          <p>
-            Built with modern web technologies for a better user experience.
-          </p>
         </FooterBottom>
       </Container>
     </FooterContainer>
